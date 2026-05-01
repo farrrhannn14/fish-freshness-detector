@@ -1,12 +1,3 @@
----
-title: Fish Freshness Detector
-emoji: 🐟
-colorFrom: blue
-colorTo: green
-sdk: docker
-app_port: 7860
----
-
 # Fish Freshness Detector: Deteksi Kesegaran Ikan Berbasis Computer Vision
 
 ## *Overview*
