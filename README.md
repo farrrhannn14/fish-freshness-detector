@@ -22,10 +22,6 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-3. Cek Dokumentasi API:
-Buka *browser* dan kunjungi alamat berikut untuk melihat dokumentasi interaktif:
-**http://127.0.0.1:8000/docs**
-
 ---
 
 ## *Endpoint* AI
@@ -37,18 +33,24 @@ Fungsi utama untuk mendeteksi tingkat kesegaran ikan dari sebuah unggahan foto.
 * *Body*: `file` (file gambar dengan format `.jpg`, `.jpeg`, `.png`, atau `.webp`)
 
 ### 2. Logika Inferensi
-* Sistem mendeteksi objek dengan tingkat keyakinan (*confidence score*) minimal 65%
-* Sistem hanya mendukung deteksi 1 ikan per foto. Jika ada banyak ikan yang terdeteksi, API akan memunculkan status `warning`.
+Sistem klasifikasi ini menggunakan ekstraksi fitur spesifik (mata dan kulit) dengan alur logika sebagai berikut:
+
+* **Threshold & Resolusi:** Model melakukan prediksi dengan ambang batas keyakinan (*confidence score*) sebesar 45.8% (sesuai evaluasi F1 dan *confidence score*) dan gambar akan diubah ukurannya (*resize*) secara internal menjadi 800px untuk mempertahankan detail fitur-fitur kecil.
+* **Resolusi Konflik Multifitur:** Apabila dalam satu *frame* terdeteksi lebih dari satu area mata atau kulit (misalnya karena ada tumpukan ikan), sistem akan secara otomatis mengambil fitur dengan tingkat keyakinan (*confidence*) paling tinggi sebagai acuan utama, dan memunculkan pesan peringatan di respons API.
+* **Logika Kesimpulan (*Pessimistic Rule*):** Sistem menerapkan standar keamanan kualitas yang ketat. Jika salah satu indikator (baik itu kulit maupun mata) terdeteksi sebagai `NonFresh`, hasil akhir (`final_conclusion`) akan langsung dikategorikan sebagai `Tidak Segar`. Ikan hanya dinyatakan `Segar` jika indikator yang terdeteksi mengarah pada kelas segar.
 
 ### 3. Contoh Respons Sukses
 Jika ikan berhasil terdeteksi sebagai ikan segar:
 ```json
 {
   "status": "success",
+  "message": "Analisis kesegaran ikan berhasil dilakukan.",
   "final_conclusion": "Segar",
   "details": {
     "skin_condition": "Fresh-Skin",
-    "eye_condition": "Fresh-Eye"
+    "eye_condition": "Fresh-Eye",
+    "skin_count": 1,
+    "eye_count": 1
   },
   "raw_predictions": [
     {
@@ -68,15 +70,18 @@ Jika tidak ada ikan yang terdeteksi pada gambar:
 ```json
 {
   "status": "success",
+  "message": "Pastikan gambar yang diunggah adalah gambar ikan yang jelas.",
   "final_conclusion": "Ikan Tidak Terdeteksi",
   "details": {
     "skin_condition": "Not Detected",
-    "eye_condition": "Not Detected"
+    "eye_condition": "Not Detected",
+    "skin_count": 0,
+    "eye_count": 0
   },
   "raw_predictions": []
 }
 ```
 
 ## 🔗 Link Akses
-* **Live API (Hugging Face):** [https://huggingface.co/spaces/frr14/fish-freshness-detector](https://huggingface.co/spaces/frr14/fish-freshness-detector)
+* **Live API (Hugging Face):** [https://huggingface.co/spaces/frr14/fish-freshness-detector](https://frr14-fish-freshness-detector.hf.space)
 * **Interactive Docs (Swagger UI):** [https://frr14-fish-freshness-detector.hf.space/docs](https://frr14-fish-freshness-detector.hf.space/docs)
