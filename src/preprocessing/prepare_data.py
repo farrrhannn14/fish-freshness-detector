@@ -1,46 +1,46 @@
 import os
+import shutil
 from roboflow import Roboflow
-from PIL import Image
 
-def download_dataset():
-    rf = Roboflow(api_key="dUJo6cQS0aGViQ30r4Qt")
-    project = rf.workspace("ahmad-farhan-hidayat-s-workspace").project("fish-freshness-0by5o-nqtfg")
-    version = project.version(3)
-    dataset = version.download("yolov8")
-
-def verify_images(base_dir):
-    corrupted_images = 0
-    total_images = 0
-
-    for root, dirs, files in os.walk(base_dir):
-        if 'images' in root:
-            for file in files:
-                if file.endswith(('.jpg', '.jpeg', '.png', '.webp')):
-                    total_images += 1
-                    file_path = os.path.join(root, file)
-                    try:
-                        img = Image.open(file_path)
-                        img.verify()
-                    except (IOError, SyntaxError) as e:
-                        print(f"Gambar Cacat Terdeteksi: {file_path}")
-                        corrupted_images += 1
-
-    print(f"Hasil Pengecekan:")
-    print(f"- Total gambar diperiksa : {total_images}")
-    print(f"- Gambar cacat     : {corrupted_images}")
+def download_and_merge():
+    API_KEY = "dUJo6cQS0aGViQ30r4Qt" 
+    rf = Roboflow(api_key=API_KEY)
     
-    if corrupted_images == 0:
-        print("Dataset sehat dan siap untuk digunakan")
-    else:
-        print("Ada gambar yang cacat!")
+    # Download Dataset Utama
+    project_utama = rf.workspace("ahmad-farhan-hidayat-s-workspace").project("fish-freshness-0by5o-nqtfg")
+    dataset_utama = project_utama.version(3).download("yolov8")
+    
+    # Download Dataset Tambahan (Ikan Bergerombol)
+    project_tambahan = rf.workspace("ahmad-farhan-hidayat-s-workspace").project("fish-freshness-yqy4n-ggiyd")
+    dataset_tambahan = project_tambahan.version(1).download("yolov8")
+    
+    dataset_utama_path = dataset_utama.location
+    dataset_tambahan_path = dataset_tambahan.location
 
-def main():
-    #download_dataset()
-    dataset_path = "data/train"
-    if os.path.exists(dataset_path):
-        verify_images(dataset_path)
-    else:
-        print("Folder dataset belum ada, silakan jalankan fungsi download_dataset() terlebih dahulu.")
+    # Merge Dataset
+    splits = ['train', 'valid', 'test']
+    for split in splits:
+        for data_type in ['images', 'labels']:
+            src_path = os.path.join(dataset_tambahan_path, split, data_type)
+            tgt_path = os.path.join(dataset_utama_path, split, data_type)
+            
+            if os.path.exists(src_path):
+                os.makedirs(tgt_path, exist_ok=True)
+                for filename in os.listdir(src_path):
+                    src_file = os.path.join(src_path, filename)
+                    tgt_file = os.path.join(tgt_path, filename)
+                    
+                    if not os.path.exists(tgt_file):
+                        shutil.move(src_file, tgt_file)
+                    else:
+                        base, ext = os.path.splitext(filename)
+                        new_tgt_file = os.path.join(tgt_path, f"{base}_new{ext}")
+                        shutil.move(src_file, new_tgt_file)
 
-if __name__ == '__main__':
-    main()
+    shutil.rmtree(dataset_tambahan_path, ignore_errors=True)
+    final_data_dir = "data/Fish-Freshness"
+    if dataset_utama_path != final_data_dir:
+        shutil.move(dataset_utama_path, final_data_dir)
+
+if __name__ == "__main__":
+    download_and_merge()
