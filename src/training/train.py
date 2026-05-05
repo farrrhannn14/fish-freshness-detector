@@ -8,7 +8,7 @@ from torchvision import datasets, models, transforms
 from torch.utils.data import DataLoader
 from ultralytics import YOLO
 
-# STAGE 1: YOLOv8 TRAINING
+# Tahap 1: Pelatihan YOLOv8
 def train_yolov8(data_yaml_path):
     model = YOLO('yolov8s.pt') 
     
@@ -35,12 +35,9 @@ def train_yolov8(data_yaml_path):
     print("Training YOLOv8 Selesai!\n")
     return results
 
-# STAGE 2: EFFICIENTNET-B3 TRAINING
+# Tahap 2: Pelatihan EfficientNet-B3
 def train_efficientnet(dataset_dir, num_epochs=10, batch_size=16):
-    print(f"\n[STAGE 2] Memulai Training EfficientNet-B3 dari {dataset_dir}...")
-    
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    print(f"Menggunakan device: {device}")
 
     data_transforms = {
         'train': transforms.Compose([
