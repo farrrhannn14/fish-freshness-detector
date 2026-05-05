@@ -36,7 +36,7 @@ def train_yolov8(data_yaml_path):
     return results
 
 # STAGE 2: EFFICIENTNET-B3 TRAINING
-def train_efficientnet(dataset_dir, num_epochs=15, batch_size=16):
+def train_efficientnet(dataset_dir, num_epochs=10, batch_size=16):
     print(f"\n[STAGE 2] Memulai Training EfficientNet-B3 dari {dataset_dir}...")
     
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -133,4 +133,4 @@ if __name__ == "__main__":
         
     EFFICIENTNET_DATA_DIR = "data/dataset_klasifikasi"
     if os.path.exists(EFFICIENTNET_DATA_DIR):
-        train_efficientnet(EFFICIENTNET_DATA_DIR, num_epochs=15)
+        train_efficientnet(EFFICIENTNET_DATA_DIR, num_epochs=10)
