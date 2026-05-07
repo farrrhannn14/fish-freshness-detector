@@ -8,7 +8,7 @@ Fish Freshness Detector merupakan sistem cerdas untuk mendeteksi tingkat kesegar
 2. Tahap 2 (*freshness classifier*): Menggunakan EfficientNet-B3 untuk memproses hasil potongan dari YOLOv8 dan mengekstrak detail tekstur serta degradasi warna yang selanjutnya digunakan dalam menentukan status kesegaran ikan akhir.
 
 ## Struktur Direktori
-Projek ini diatur dengan struktur arsitektur berikut:
+Proyek ini diatur dengan struktur arsitektur berikut:
 * `app/` : *Source code* untuk FastAPI (*routing*, *schema*, dan logika inferensi API).
 * `models/` : Direktori penyimpanan bobot model terbaik, berisi `yolo_best.pt` dan `efficientnet_best.pth`.
 * `src/` : Kumpulan *script* Python pendukung untuk dokumentasi *preprocessing*, augmentasi, pelatihan, dan evaluasi model.
@@ -124,7 +124,7 @@ Sistem dirancang sedemikian rupa untuk mensimulasikan proses klasifikasi di duni
 }
 ```
 ### 6. Penafian (*Disclaimer*)
-Sistem ini dioptimalkan dalam mendeteksi citra ikan tunggal (hanya ada satu ikan di dalam foto). Citra ikan bergerombol atau bertumpuk tetap bisa terdeteksi, tetapi mungkin akurasi inferensi menurun.
+Sistem ini dioptimalkan dalam mendeteksi citra ikan tunggal (hanya ada satu ikan di dalam foto). Citra ikan bergerombol atau bertumpuk tetap bisa terdeteksi, tetapi akurasi inferensi mungkin menurun.
 
 ### 5. Akses
 * Live API (Hugging Face): https://frr14-fish-freshness-detector.hf.space
