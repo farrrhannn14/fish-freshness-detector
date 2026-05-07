@@ -6,7 +6,6 @@ from app.schemas import PredictionResponse
 app = FastAPI(
     title="Fish Freshness API",
     description="API untuk mendeteksi kesegaran ikan menggunakan YOLOv8 dan EfficientNet",
-    version="1.0.0"
 )
 
 @app.get("/")

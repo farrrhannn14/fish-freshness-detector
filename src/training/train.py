@@ -1,6 +1,7 @@
 import os
 import time
 import copy
+import shutil
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -32,7 +33,17 @@ def train_yolov8(data_yaml_path):
         weight_decay=0.0005,
         warmup_epochs=3
     )
-    print("Training YOLOv8 Selesai!\n")
+    
+    os.makedirs('models', exist_ok=True)
+    default_save_path = os.path.join('runs', 'detect', 'yolov8s-model', 'weights', 'best.pt')
+    target_save_path = os.path.join('models', 'yolo_best.pt')
+    
+    if os.path.exists(default_save_path):
+        shutil.copy(default_save_path, target_save_path)
+        print(f"Training YOLOv8 Selesai! Model disimpan di: {target_save_path}\n")
+    else:
+        print("Peringatan: Gagal menemukan file best.pt dari YOLOv8!")
+
     return results
 
 # Tahap 2: Pelatihan EfficientNet-B3
