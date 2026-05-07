@@ -37,9 +37,10 @@ uvicorn app.main:app --reload
 ### 2. Logika Inferensi
 Sistem dirancang sedemikian rupa untuk mensimulasikan proses klasifikasi di dunia nyata:
 
-* *On the fly cropping*: Gambar yang diunggah akan di-resize secara proporsional. Organ yang terdeteksi oleh YOLOv8 akan di-crop langsung di dalam memori (RAM) tanpa disimpan ke storage.
-* Penanganan ikan bergerombol: Model telah dilatih untuk menangani foto ikan bergerombol. Jika dalam satu frame terdeteksi banyak mata atau kulit, sistem mengurutkan dan mengambil fitur dengan confidence score tertinggi sebagai acuan utama inferensi, lalu mengembalikan atribut *warning* pada respons API.
-* *Pessimistic rule* (standar keamanan ketat): Sistem mengambil kesimpulan secara pesimistis demi keamanan konsumsi. Jika EfficientNet mendeteksi salah satu indikator pada fitur sebagai `Tidak Segar`, hasil `final_conclusion` akan langsung memvonis ikan tersebut sebagai Tidak Segar meskipun indikator lainnya tampak segar. Karena itu, model ini akan lebih optimal jika digunakan untuk mendeteksi ikan tunggal dalam satu foto meskipun model telah dilatih menangani ikan bergerombol.
+* Foto yang diunggah akan di-*resize* secara proporsional. YOLOv8 akan mendeteksi apakah ada organ mata dan/atau kulit di dalam foto. Kemudian, organ yang terdeteksi oleh YOLOv8 akan di-*crop* langsung untuk dikirimkan ke model EfficientNet-B3.
+* Model EfficientNet-B3 melakukan prediksi berdasarkan foto organ mata dan/atau kulit hasil *cropping* YOLOv8 untuk menentukan status kesegaran organ tersebut.
+* Penanganan ikan bergerombol: Model telah dilatih untuk menangani foto ikan bergerombol. Jika dalam satu frame terdeteksi banyak mata atau kulit, sistem mengurutkan dan mengambil fitur dengan *confidence score* tertinggi sebagai acuan utama inferensi, lalu mengembalikan atribut *warning* pada respons API.
+* *Pessimistic rule* (standar keamanan ketat): sistem mengambil kesimpulan secara pesimistis demi keamanan konsumsi. Jika EfficientNet mendeteksi salah satu indikator pada fitur sebagai `Tidak Segar`, hasil `final_conclusion` akan langsung memvonis ikan tersebut sebagai Tidak Segar meskipun indikator lainnya tampak segar.
 
 ### 3. Contoh Respons API
 * Terdeteksi lebih dari satu ikan dalam foto
@@ -75,6 +76,7 @@ Sistem dirancang sedemikian rupa untuk mensimulasikan proses klasifikasi di duni
         "x2": 601,
         "y2": 399
       }
+    }
 ```
 * Terdeteksi ikan tunggal
 ```JSON
