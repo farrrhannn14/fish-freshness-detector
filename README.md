@@ -1,11 +1,11 @@
 # Fish Freshness Detector: Deteksi Kesegaran Ikan Berbasis Computer Vision
 
 ## *Overview*
-Fish Freshness Detector merupakan sistem cerdas untuk mendeteksi tingkat kesegaran ikan secara otomatis berdasarkan analisis visual pada area kulit dan mata. Sistem ini ditenagai oleh *Cascade Architecture (Two-Stage Pipeline)* yang menggabungkan kemampuan YOLOv8 dalam *object detection* dan akurasi EfficientNet-B3 dalam *image classification*. Sistem disajikan dalam bentuk RESTful API yang cepat dan responsif menggunakan FastAPI serta siap di-*deploy* dalam *environment container* (Docker).
+Fish Freshness Detector merupakan sistem cerdas untuk mendeteksi tingkat kesegaran ikan secara otomatis berdasarkan analisis visual pada area kulit dan mata. Sistem ini ditenagai oleh *two-stage pipeline* yang menggabungkan kemampuan YOLOv8 dalam *object detection* dan akurasi EfficientNet-B3 dalam *image classification*. Sistem disajikan dalam bentuk RESTful API yang cepat dan responsif menggunakan FastAPI serta siap di-*deploy* dalam *environment container* (Docker).
 
 ## Arsitektur Model (*Two-Stage Pipeline*)
-1. Tahap 1 (*Region Proposal*): Menggunakan YOLOv8 untuk melokalisasi dan mendeteksi titik koordinat organ spesifik ikan (mata dan kulit) dengan tingkat akurasi tinggi, bahkan pada kondisi ikan yang saling tumpang tindih (*occluded*).
-2. Tahap 2 (*Freshness Classifier*): Menggunakan EfficientNet-B3 untuk memproses hasil potongan (*crop*) dari YOLOv8 dan mengekstrak detail tekstur serta degradasi warna yang selanjutnya digunakan dalam menentukan status kesegaran ikan akhir.
+1. Tahap 1 (*ROI extraction*): Menggunakan YOLOv8 untuk melokalisasi dan mendeteksi titik koordinat organ spesifik ikan (mata dan kulit) dengan tingkat akurasi tinggi, bahkan pada kondisi ikan yang saling tumpang tindih (*occluded*).
+2. Tahap 2 (*freshness classifier*): Menggunakan EfficientNet-B3 untuk memproses hasil potongan dari YOLOv8 dan mengekstrak detail tekstur serta degradasi warna yang selanjutnya digunakan dalam menentukan status kesegaran ikan akhir.
 
 ## Struktur Direktori
 Projek ini diatur dengan struktur arsitektur berikut:
@@ -14,6 +14,11 @@ Projek ini diatur dengan struktur arsitektur berikut:
 * `src/` : Kumpulan *script* Python pendukung untuk dokumentasi *preprocessing*, augmentasi, pelatihan, dan evaluasi model.
 * `data/` : Folder terisolasi untuk manajemen dataset lokal (diabaikan di repositori melalui `.gitignore` untuk efisiensi *storage*).
 * `Dockerfile` & `.dockerignore` : Konfigurasi standar untuk *deployment container*.
+
+## Sumber *Dataset*
+Proyek ini mengambil *dataset* dari platform Roboflow:
+* [*dataset* citra ikan tunggal (dari thesis-sbtll/fish-freshness-0by5o)](https://universe.roboflow.com/thesis-sbtll/fish-freshness-0by5o) sebagai *dataset* utama; dan
+* [*dataset* citra ikan bertumpuk dan bergerombol (dari parietpi/fish-freshness-yqy4n)](https://universe.roboflow.com/parietpi/fish-freshness-yqy4n) sebagai *dataset* tambahan untuk menambah variasi data dalam proses pembelajaran bagi model.
 
 ## Cara Menjalankan Server (Lokal)
 
@@ -118,6 +123,9 @@ Sistem dirancang sedemikian rupa untuk mensimulasikan proses klasifikasi di duni
   "detail_deteksi": []
 }
 ```
-### 4. Akses
+### 6. Penafian (*Disclaimer*)
+Sistem ini dioptimalkan dalam mendeteksi citra ikan tunggal (hanya ada satu ikan di dalam foto). Citra ikan bergerombol atau bertumpuk tetap bisa terdeteksi, tetapi mungkin akurasi inferensi menurun.
+
+### 5. Akses
 * Live API (Hugging Face): https://frr14-fish-freshness-detector.hf.space
 * Interactive Docs (Swagger UI): https://frr14-fish-freshness-detector.hf.space/docs
